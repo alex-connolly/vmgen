@@ -41,17 +41,17 @@ type instruction struct {
 const prototype = "vmgen.efp"
 
 // CreateVM creates a new FireVM instance
-func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string]FuelFunction) *VM {
+func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string]FuelFunction) (*VM, []string) {
 	p, errs := efp.PrototypeFile(prototype)
 	if errs != nil {
-		fmt.Printf("Invalid prototype file\n")
+		fmt.Printf("Invalid Prototype File\n")
 		fmt.Println(errs)
-		return nil
+		return nil, errs
 	}
 	e, errs := p.ValidateFile(path)
 	if errs != nil {
-		fmt.Printf("Invalid VM file %s\n", path)
-		return nil
+		fmt.Printf("Invalid VM File %s\n", path)
+		return nil, errs
 	}
 
 	var vm VM
@@ -86,7 +86,7 @@ func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string
 	vm.stats = new(stats)
 
 	vm.Stack = new(Stack)
-	return &vm
+	return &vm, nil
 }
 
 func (vm *VM) createParameters(params []string) []reflect.Value {

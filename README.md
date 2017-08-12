@@ -1,6 +1,6 @@
 # VMGen
 
-An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines, initially developed for use with [FireVM](https://www.github.com/end-r/firevm)
+An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines, initially developed for use with [FireVM](https://www.github.com/end-r/firevm).
 
 
 In ```example.vm```:
@@ -25,7 +25,7 @@ instruction("PUSH"){
 }
 ```
 
-We store out bytecode in ```example.fire```
+We could either use IR bytecode in ```example.fire```:
 
 ```go
 PUSH 1
@@ -35,16 +35,47 @@ PUSH 5
 ADD
 ```
 
+Or a fully compiled version:
+
+```go
+0x010201010201020102010502
+```
+
 Now, our Go program:
 
 ```go
-package vmgen
+package main
+
+import "github.com/end-r/vmgen"
 
 const fuel = 1000
 
+var (
+    fuels = map[string]vmgen.FuelFunction{
+
+    }
+    executes = map[string]vmgen.ExecuteFunction{
+        "ADD": Add,
+        "PUSH": Push,
+    }
+)
+
 func main(){
-    vm := ParseFile("example.vm")
-    vm.Run(fuel, "example.fire")
+    vm := vmgen.CreateVM("example.vm", executes, fuels)
+    vm.ExecuteFile(fuel, "example.fire")
     vm.Stats()
+}
+
+func Add(vm *vmgen.VM, params []byte){
+    a := vm.Stack.Pop()
+    b := vm.Stack.Pop()
+    c := a.Add(b)
+    vm.Stack.Push(c)
+}
+
+func Push(vm *vmgen.VM, params []byte){
+    size := vm.Input.Next(1)
+    value := vm.Input.Next(size)
+    vm.Stack.Push(c)
 }
 ```

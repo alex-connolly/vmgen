@@ -1,13 +1,14 @@
 name = "Sample"
 author = "Me"
-receiver = "sampleVM"
 
 instruction("ADD"){
+    hex = 01
     execute = add
     fuel = 20
 }
 
 instruction("PUSH"){
+    hex = 02
     execute = push
     fuel = 10
 }
