@@ -1,14 +1,14 @@
 package vmgen
 
+// Stack ...
 type Stack interface {
 	Push([]byte)
 	Pop(uint)
 	Size() uint
-	PushFrame(Frame)
-	PopFrame()
 }
 
-func (vm *VM) SetStack(s Stack) {
+// SetStack ...
+func (vm *VM) SetStack(s *Stack) {
 	vm.Stack = s
 }
 
