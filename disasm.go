@@ -1,6 +1,6 @@
 package vmgen
 
 // Disasm ...
-func Disasm() {
+func (vm *VM) Disasm(bytecode []byte) {
 
 }

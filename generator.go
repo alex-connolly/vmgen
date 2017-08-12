@@ -1,13 +1,10 @@
 package vmgen
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
-	"strings"
 
 	"github.com/end-r/efp"
 )
@@ -25,20 +22,26 @@ type VM struct {
 	Memory         []interface{}
 }
 
+// FuelFunction ...
+type FuelFunction func(*VM, []byte) int
+
+// ExecuteFunction ...
+type ExecuteFunction func(*VM, []byte)
+
 // Instruction for the current FireVM instance
 type instruction struct {
 	opcode       string
 	description  string
-	execute      string
+	execute      ExecuteFunction
 	fuel         int
-	fuelFunction string
+	fuelFunction FuelFunction
 	count        int
 }
 
 const prototype = "vmgen.efp"
 
 // CreateVM creates a new FireVM instance
-func CreateVM(path string) *VM {
+func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string]FuelFunction) *VM {
 	p, errs := efp.PrototypeFile(prototype)
 	if errs != nil {
 		fmt.Printf("Invalid prototype file\n")
@@ -50,6 +53,7 @@ func CreateVM(path string) *VM {
 		fmt.Printf("Invalid VM file %s\n", path)
 		return nil
 	}
+
 	var vm VM
 	// no need to check for nil: would have errored
 	vm.Author = e.FirstField("author").Value()
@@ -68,10 +72,10 @@ func CreateVM(path string) *VM {
 		if err != nil {
 			i.fuel = int(fuel)
 		} else {
-			i.fuelFunction = e.FirstField("fuel").Value()
+			i.fuelFunction = fuels[e.FirstField("fuel").Value()]
 		}
 
-		i.execute = e.FirstField("execute").Value()
+		i.execute = executes[e.FirstField("execute").Value()]
 
 		opcode := e.Parameter(0).Value()
 		i.opcode = opcode
@@ -94,33 +98,34 @@ func (vm *VM) createParameters(params []string) []reflect.Value {
 	return vals
 }
 
-func splitInstruction(text string) (string, []string) {
-	all := strings.Split(text, " ")
-	return all[0], all[1:]
-}
-
 // ExecuteFile parses opcodes from a file
-func (vm *VM) ExecuteFile(path string) {
-	file, err := os.Open(path)
+func (vm *VM) ExecuteFile(path string) error {
+	f, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		opcode, params := splitInstruction(scanner.Text())
-		vm.executeInstruction(opcode, params)
+	defer f.Close()
+	fi, err := f.Stat()
+	if err != nil {
+		return err
 	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	bytes := make([]byte, fi.Size())
+	_, err = f.Read(bytes)
+	if err != nil {
+		return err
 	}
+	return nil
 }
 
-func (vm *VM) executeInstruction(opcode string, params []string) {
-	//i := vm.instructions[opcode]
-
+func (vm *VM) executeInstruction(opcode string, params []byte) {
+	i := vm.Instructions[opcode]
+	i.execute(vm, params)
+	vm.stats.operations++
+	if i.fuelFunction != nil {
+		vm.stats.fuelConsumption += i.fuel
+	} else {
+		vm.stats.fuelConsumption += i.fuelFunction(vm, params)
+	}
 }
 
 func version() string {

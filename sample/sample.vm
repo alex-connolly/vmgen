@@ -1,0 +1,13 @@
+name = "Sample"
+author = "Me"
+receiver = "sampleVM"
+
+instruction("ADD"){
+    execute = add
+    fuel = 20
+}
+
+instruction("PUSH"){
+    execute = push
+    fuel = 10
+}

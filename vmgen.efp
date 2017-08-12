@@ -2,7 +2,7 @@ name : string
 author : string
 type : string
 
-alias IDOrInt = identifier | int
+alias IDOrInt = identifier|int
 
 <1:instruction>(string){
     description : string
