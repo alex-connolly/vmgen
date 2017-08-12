@@ -18,7 +18,7 @@ type VM struct {
 	ProgramCounter int
 	Current        instruction
 	stats          *stats
-	Stack          *Stack
+	Stack          Stack
 	Memory         []interface{}
 }
 
@@ -85,7 +85,7 @@ func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string
 
 	vm.stats = new(stats)
 
-	vm.Stack = new(Stack)
+	vm.Stack = *new(Stack)
 	return &vm, nil
 }
 
