@@ -20,7 +20,11 @@ type VM struct {
 	stats          *stats
 	Stack          *Stack
 	Memory         []interface{}
+	Environment    Environment
 }
+
+// Environment ...
+type Environment map[string][]byte
 
 // FuelFunction ...
 type FuelFunction func(*VM, []byte) int
