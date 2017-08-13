@@ -5,25 +5,46 @@ import (
 	"os"
 )
 
+// DissemblyFunction ...
+type DissemblyFunction func(int, []byte) (string, int)
+
+// DissemblyOptions ...
+type DissemblyOptions struct {
+	Parameters     map[string]byte
+	ParameterNames []string
+	Functions      map[byte]DissemblyFunction
+}
+
 // DisasmBytes ...
-func (vm *VM) DisasmBytes(bytecode []byte) {
+func (vm *VM) DisasmBytes(bytecode []byte, options *DissemblyOptions) {
 	log.Printf("%s Disassembler", vm.Name)
 	for i := 0; i < len(vm.Name)+len(" Disassembler"); i++ {
 		log.Printf("=")
 	}
-	log.Printf("Size Byte: %x", bytecode[0])
-	for i := 1; i < len(bytecode); i++ {
-
+	for i, pn := range options.ParameterNames {
+		// assign the parameters (used in disasm calcs)
+		options.Parameters[pn] = bytecode[i]
+		log.Printf("| %s: %x |", pn, bytecode[i])
+	}
+	for i := len(options.ParameterNames); i < len(bytecode); i++ {
+		if f, ok := options.Functions[bytecode[i]]; ok {
+			str, offset := f(i, bytecode)
+			i += offset
+			log.Println(str)
+		} else {
+			// default is just to print the instruction mnemonic
+			log.Printf("| %s |\n", vm.Instructions[bytecode[i]].mnemonic)
+		}
 	}
 }
 
 // DisasmString ...
-func (vm *VM) DisasmString(data string) {
-	vm.DisasmBytes([]byte(data))
+func (vm *VM) DisasmString(data string, options *DissemblyOptions) {
+	vm.DisasmBytes([]byte(data), options)
 }
 
 // DisasmFile ...
-func (vm *VM) DisasmFile(path string) {
+func (vm *VM) DisasmFile(path string, options *DissemblyOptions) {
 	f, err := os.Open(path)
 	if err != nil {
 		return
@@ -38,5 +59,5 @@ func (vm *VM) DisasmFile(path string) {
 	if err != nil {
 		return
 	}
-	vm.DisasmBytes(bytes)
+	vm.DisasmBytes(bytes, options)
 }

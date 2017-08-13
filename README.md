@@ -82,3 +82,41 @@ func Push(vm *vmgen.VM){
     vm.Stack.Push(value)
 }
 ```
+
+## Fuel
+
+vmgen was built as a generator for costly virtual machines, where each instruction is given a fixed or variable cost and 'charged' against an initial balance, preventing infinite loops and sidestepping the halting problem. The fuel for an can be provided in one of two ways:
+
+1. By assigning an unsigned integer to the fuel field:
+
+```fuel = 100```
+
+2. By assigning an identifier to the fuel field and providing a mapping:
+
+```fuel = getFuel```
+
+```go
+fuels = map[string]vmgen.FuelFunction{
+    "getFuel": getFuel,
+}
+
+getFuel(vm *vmGen) int{
+
+}
+```
+
+## Disassembly
+
+vmgen provides support for generalised disassembly.
+
+```go
+DisasmString(data string)
+DisasmBytes(bytes byte)
+DisasmFile(path string)
+```
+
+Generally, instructions will be printed in the following format:
+
+| 0x01 | ADD |
+
+By using the ```disassemble = {identifier}``` field in the ```.vm``` file, it is

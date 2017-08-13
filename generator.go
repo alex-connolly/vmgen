@@ -3,6 +3,7 @@ package vmgen
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 
@@ -14,7 +15,7 @@ type VM struct {
 	Name         string
 	Author       string
 	Receiver     string
-	Instructions map[string]instruction
+	Instructions map[byte]instruction
 	PC           int
 	Current      instruction
 	stats        *stats
@@ -43,7 +44,7 @@ type ExecuteFunction func(*VM)
 
 // Instruction for the current FireVM instance
 type instruction struct {
-	opcode       string
+	mnemonic     string
 	description  string
 	execute      ExecuteFunction
 	fuel         int
@@ -55,7 +56,12 @@ const prototype = "vmgen.efp"
 
 // CreateVM creates a new FireVM instance
 func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string]FuelFunction) (*VM, []string) {
-	p, errs := efp.PrototypeFile(prototype)
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
+	p, errs := efp.PrototypeFile(exPath + "/" + prototype)
 	if errs != nil {
 		fmt.Printf("Invalid Prototype File\n")
 		fmt.Println(errs)
@@ -73,7 +79,7 @@ func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string
 	vm.Name = e.FirstField("name").Value()
 	vm.Receiver = e.FirstField("receiver").Value()
 
-	vm.Instructions = make(map[string]instruction)
+	vm.Instructions = make(map[byte]instruction)
 	for _, e := range e.Elements("instruction") {
 		var i instruction
 		i.description = e.FirstField("description").Value()
@@ -90,8 +96,8 @@ func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string
 
 		i.execute = executes[e.FirstField("execute").Value()]
 
-		opcode := e.Parameter(0).Value()
-		i.opcode = opcode
+		i.mnemonic = e.Parameter(0).Value()
+		i.opcode = e.Parameter(1).Value()
 
 		vm.Instructions[opcode] = i
 	}
