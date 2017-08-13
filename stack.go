@@ -1,7 +1,7 @@
 package vmgen
 
 // SetStack ...
-func (vm *VM) SetStack(s Stack) {
+func (vm *VM) SetStack(s *Stack) {
 	vm.Stack = s
 }
 

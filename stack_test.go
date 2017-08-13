@@ -17,7 +17,7 @@ func TestPop(t *testing.T) {
 	data := []byte("me")
 	util.Assert(t, len(data) == 2, "wrong data length")
 	vm := new(VM)
-	vm.SetStack(Stack{})
+	vm.SetStack(new(Stack))
 	util.Assert(t, vm.Stack.Size() == 0, "wrong starting length")
 	vm.Stack.Push(data)
 	util.Assert(t, vm.Stack.Size() == 2, "wrong length after push")
