@@ -2,6 +2,7 @@ package vmgen
 
 import (
 	"fmt"
+	"math/big"
 	"os"
 	"reflect"
 	"strconv"
@@ -11,26 +12,61 @@ import (
 
 // VM ...
 type VM struct {
-	Name           string
-	Author         string
-	Receiver       string
-	Instructions   map[string]instruction
-	ProgramCounter int
-	Current        instruction
-	stats          *stats
-	Stack          *Stack
-	Memory         []interface{}
-	Environment    Environment
+	Name         string
+	Author       string
+	Receiver     string
+	Instructions map[string]instruction
+	PC           int
+	Current      instruction
+	stats        *stats
+	Stack        *Stack
+	Memory       []interface{}
+	Environment  Environment
+	Contract     Contract
+}
+
+// Contract is the struct used for the currently executing section of code
+// Contract represents an ethereum contract in the state database. It contains
+// the the contract code, calling arguments. Contract implements ContractRef
+type Contract struct {
+	// CallerAddress is the result of the caller which initialised this
+	// contract. However when the "call method" is delegated this value
+	// needs to be initialised to that of the caller's caller.
+	CallerAddress Address
+	caller        Address
+	self          Address
+
+	//jumpdests destinations
+
+	Code     []byte
+	CodeHash Hash
+	CodeAddr *Address
+	Input    []byte
+
+	Gas   uint64
+	value *big.Int
+
+	Args []byte
+
+	DelegateCall bool
+}
+
+// Address ...
+type Address interface {
+}
+
+// Hash ...
+type Hash interface {
 }
 
 // Environment ...
 type Environment map[string][]byte
 
 // FuelFunction ...
-type FuelFunction func(*VM, []byte) int
+type FuelFunction func(*VM) int
 
 // ExecuteFunction ...
-type ExecuteFunction func(*VM, []byte)
+type ExecuteFunction func(*VM)
 
 // Instruction for the current FireVM instance
 type instruction struct {
@@ -121,14 +157,14 @@ func (vm *VM) ExecuteFile(path string) error {
 	return nil
 }
 
-func (vm *VM) executeInstruction(opcode string, params []byte) {
+func (vm *VM) executeInstruction(opcode string) {
 	i := vm.Instructions[opcode]
-	i.execute(vm, params)
+	i.execute(vm)
 	vm.stats.operations++
 	if i.fuelFunction != nil {
 		vm.stats.fuelConsumption += i.fuel
 	} else {
-		vm.stats.fuelConsumption += i.fuelFunction(vm, params)
+		vm.stats.fuelConsumption += i.fuelFunction(vm)
 	}
 }
 
