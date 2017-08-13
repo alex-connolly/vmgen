@@ -46,7 +46,10 @@ Now, our Go program:
 ```go
 package main
 
-import "github.com/end-r/vmgen"
+import (
+    "github.com/end-r/vmgen"
+    "math/big"
+)
 
 const fuel = 1000
 
@@ -66,16 +69,16 @@ func main(){
     vm.Stats()
 }
 
-func Add(vm *vmgen.VM, params []byte){
+func Add(vm *vmgen.VM){
     a := vm.Stack.Pop()
     b := vm.Stack.Pop()
-    c := a.Add(b)
+    c := new(big.Int).Add(a, b)
     vm.Stack.Push(c)
 }
 
-func Push(vm *vmgen.VM, params []byte){
-    size := vm.Input.Next(1)
-    value := vm.Input.Next(size)
-    vm.Stack.Push(c)
+func Push(vm *vmgen.VM){
+    size := vm.Contract.Next(1)
+    value := vm.Contract.Next(size)
+    vm.Stack.Push(value)
 }
 ```

@@ -1,8 +1,9 @@
 package sample
 
 import (
-	"axia/vmgen"
 	"log"
+
+	"github.com/end-r/vmgen"
 )
 
 const (
@@ -10,27 +11,23 @@ const (
 	dataPath = "sample.bytes"
 )
 
-func main() {
+func newVM() *vmgen.VM {
 	ops := map[string]vmgen.ExecuteFunction{
-		"Add":  add,
-		"Push": push,
+		"ADD":  add,
+		"PUSH": push,
 	}
 	fuel := map[string]vmgen.FuelFunction{}
 	vm, err := vmgen.CreateVM(vmPath, ops, fuel)
 	if err != nil {
 		log.Fatal(err)
-		return
+		return nil
 	}
-
-	vm.ExecuteFile(dataPath)
+	return vm
 }
 
-func add(vm vmgen.VM, params []byte) {
-	a := vm.Stack.Pop(1)
-	b := vm.vm.Stack.Pop(1)
-	vm.vm.Stack.Push(a + b)
+func add(vm *vmgen.VM) {
+
 }
 
-func push(vm vmgen.VM, params []byte) {
-	vm.vm.Stack.Push(params)
+func push(vm *vmgen.VM) {
 }

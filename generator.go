@@ -2,7 +2,6 @@ package vmgen
 
 import (
 	"fmt"
-	"math/big"
 	"os"
 	"reflect"
 	"strconv"
@@ -21,34 +20,8 @@ type VM struct {
 	stats        *stats
 	Stack        *Stack
 	Memory       []interface{}
-	Environment  Environment
-	Contract     Contract
-}
-
-// Contract is the struct used for the currently executing section of code
-// Contract represents an ethereum contract in the state database. It contains
-// the the contract code, calling arguments. Contract implements ContractRef
-type Contract struct {
-	// CallerAddress is the result of the caller which initialised this
-	// contract. However when the "call method" is delegated this value
-	// needs to be initialised to that of the caller's caller.
-	CallerAddress Address
-	caller        Address
-	self          Address
-
-	//jumpdests destinations
-
-	Code     []byte
-	CodeHash Hash
-	CodeAddr *Address
-	Input    []byte
-
-	Gas   uint64
-	value *big.Int
-
-	Args []byte
-
-	DelegateCall bool
+	Environment  *Environment
+	Contract     *Contract
 }
 
 // Address ...
