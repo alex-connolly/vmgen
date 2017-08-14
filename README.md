@@ -1,6 +1,8 @@
 # VMGen
 
-An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines, initially developed for use with [FireVM](https://www.github.com/end-r/firevm).
+An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines, initially developed for use with [FireVM](https://www.github.com/end-r/firevm). 
+
+## Example
 
 
 In ```example.vm```:
@@ -83,27 +85,41 @@ func Push(vm *vmgen.VM){
 }
 ```
 
+## Instruction Syntax
+
+See ```vmgen.efp``` for the prototype file, below is a full example instruction:
+
+```go
+instruction("OPCODE", "0x33"){
+    fuel = 100
+}
+```
+
 ## Fuel
 
-vmgen was built as a generator for costly virtual machines, where each instruction is given a fixed or variable cost and 'charged' against an initial balance, preventing infinite loops and sidestepping the halting problem. The fuel for an can be provided in one of two ways:
+vmgen was built as a generator for costly virtual machines, where each instruction is given a fixed or variable cost and 'charged' against an initial balance, preventing infinite loops and sidestepping the halting problem. The fuel for an instruction can be provided in one of two ways:
 
 1. By assigning an unsigned integer to the fuel field:
 
 ```fuel = 100```
 
-2. By assigning an identifier to the fuel field and providing a mapping:
+2. By providing a fuel function mapping:
 
-```fuel = getFuel```
+```go
+instruction("HI", "0x40")
+```
 
 ```go
 fuels = map[string]vmgen.FuelFunction{
-    "getFuel": getFuel,
+    "HI": getFuel,
 }
 
 getFuel(vm *vmgen.VM) int{
 
 }
 ```
+
+If neither of these are set, the instruction will have its fuel cost set to 0.
 
 ## Disassembly
 
@@ -137,4 +153,4 @@ func customDisasm(offset int, bytecode []byte)([]string, int){
 
 Thus, you can produce output like:
 
-| 0x02 | PUSH | 0x02 | 0xFF00 | 
+| PUSH | 0x02 | 0xFF00 |
