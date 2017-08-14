@@ -12,17 +12,19 @@ import (
 
 // VM ...
 type VM struct {
-	Name         string
-	Author       string
-	Receiver     string
-	Instructions map[byte]instruction
-	PC           int
-	Current      instruction
-	stats        *stats
-	Stack        *Stack
-	Memory       []interface{}
-	Environment  *Environment
-	Contract     *Contract
+	Name               string
+	Author             string
+	Receiver           string
+	Instructions       map[string]instruction
+	Parameters         map[string]int
+	AssignedParameters map[string][]byte
+	PC                 int
+	Current            instruction
+	stats              *stats
+	Stack              *Stack
+	Memory             []interface{}
+	Environment        *Environment
+	Contract           *Contract
 }
 
 // Address ...
@@ -44,18 +46,27 @@ type ExecuteFunction func(*VM)
 
 // Instruction for the current FireVM instance
 type instruction struct {
-	mnemonic     string
-	description  string
-	execute      ExecuteFunction
-	fuel         int
-	fuelFunction FuelFunction
-	count        int
+	mnemonic       string
+	opcode         []byte
+	description    string
+	execute        ExecuteFunction
+	fuel           int
+	fuelFunction   FuelFunction
+	disasmFunction DisasmFunction
+	count          int
+}
+
+func (vm *VM) getNextInstruction(offset int, bytecode []byte) instruction {
+	size := vm.AssignedParameters["Instruction Size"]
+	return vm.Instructions[string(bytecode[offset:offset+int(size)])]
 }
 
 const prototype = "vmgen.efp"
 
 // CreateVM creates a new FireVM instance
-func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string]FuelFunction) (*VM, []string) {
+func CreateVM(path string, parameters map[string]int,
+	executes map[string]ExecuteFunction, fuels map[string]FuelFunction,
+	disasms map[string]DisasmFunction) (*VM, []string) {
 	ex, err := os.Executable()
 	if err != nil {
 		panic(err)
@@ -77,11 +88,14 @@ func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string
 	// no need to check for nil: would have errored
 	vm.Author = e.FirstField("author").Value()
 	vm.Name = e.FirstField("name").Value()
-	vm.Receiver = e.FirstField("receiver").Value()
 
-	vm.Instructions = make(map[byte]instruction)
+	vm.Instructions = make(map[string]instruction)
 	for _, e := range e.Elements("instruction") {
 		var i instruction
+
+		i.mnemonic = e.Parameter(0).Value()
+		i.opcode = []byte(e.Parameter(1).Value())
+
 		i.description = e.FirstField("description").Value()
 
 		// try to get fuel as an integer
@@ -94,12 +108,9 @@ func CreateVM(path string, executes map[string]ExecuteFunction, fuels map[string
 			i.fuelFunction = fuels[e.FirstField("fuel").Value()]
 		}
 
-		i.execute = executes[e.FirstField("execute").Value()]
+		i.execute = executes[i.Mnemonic]
 
-		i.mnemonic = e.Parameter(0).Value()
-		i.opcode = e.Parameter(1).Value()
-
-		vm.Instructions[opcode] = i
+		vm.Instructions[string(i.opcode)] = i
 	}
 
 	vm.stats = new(stats)
@@ -144,6 +155,13 @@ func (vm *VM) executeInstruction(opcode string) {
 		vm.stats.fuelConsumption += i.fuel
 	} else {
 		vm.stats.fuelConsumption += i.fuelFunction(vm)
+	}
+}
+
+func (vm *VM) assignParameters() {
+	for k, v := range vm.Parameters {
+		vm.AssignedParameters[k] = vm.Contract.Code[vm.Contract.Offset : vm.Contract.Offset+v]
+		vm.Contract.Offset += v
 	}
 }
 

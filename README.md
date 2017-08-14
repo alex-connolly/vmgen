@@ -100,7 +100,7 @@ fuels = map[string]vmgen.FuelFunction{
     "getFuel": getFuel,
 }
 
-getFuel(vm *vmGen) int{
+getFuel(vm *vmgen.VM) int{
 
 }
 ```
@@ -119,4 +119,22 @@ Generally, instructions will be printed in the following format:
 
 | 0x01 | ADD |
 
-By using the ```disassemble = {identifier}``` field in the ```.vm``` file, it is
+By using the ```disasm = customDisasm``` field in the ```.vm``` file, you can assign a mapped disassembly function to an instruction.
+
+In your go code:
+
+```go
+disasms = map[string]vmgen.DisasmFunction{
+    "customDisasm": customDisasm,
+}
+
+func customDisasm(offset int, bytecode []byte)([]string, int){
+    // everything will be in format | o1 | o2 | o3 |
+    // return []string{o1, o2, o3}, totalOffsetChange
+    // this is done for pretty formatting reasons
+}
+```
+
+Thus, you can produce output like:
+
+| 0x02 | PUSH | 0x02 | 0xFF00 | 

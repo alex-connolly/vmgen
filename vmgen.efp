@@ -1,14 +1,11 @@
 name : string
 author : string
-type : string
 
 alias IDOrInt = identifier|int
 alias hex = "0x[0-9][A-F]+"
 
 <1:instruction>(string, hex){
     description : string
-    push : int
-    pop : int
-    fuel : IDOrInt
-    execute : identifier
+    validate : int
+    fuel : int
 }

@@ -11,13 +11,16 @@ const (
 	dataPath = "sample.bytes"
 )
 
-func newVM() *vmgen.VM {
+func newVM(disasms map[string]vmgen.DisasmFunction) *vmgen.VM {
 	ops := map[string]vmgen.ExecuteFunction{
 		"ADD":  add,
 		"PUSH": push,
 	}
 	fuel := map[string]vmgen.FuelFunction{}
-	vm, err := vmgen.CreateVM(vmPath, ops, fuel)
+	parameters := map[string]int{
+		"Size Byte": 1,
+	}
+	vm, err := vmgen.CreateVM(vmPath, parameters, ops, fuel, disasms)
 	if err != nil {
 		log.Fatal(err)
 		return nil

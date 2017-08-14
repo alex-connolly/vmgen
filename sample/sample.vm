@@ -1,14 +1,11 @@
 name = "Sample"
 author = "Me"
 
-instruction("ADD"){
-    hex = 01
-    execute = add
+instruction("ADD", "0x01"){
+    validate = 2
     fuel = 20
 }
 
-instruction("PUSH"){
-    hex = 02
-    execute = push
+instruction("PUSH", "0x02"){
     fuel = 10
 }

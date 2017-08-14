@@ -17,6 +17,7 @@ type Contract struct {
 	CodeHash Hash
 	CodeAddr *Address
 	Input    []byte
+	Offset   int
 
 	Gas   uint64
 	value *big.Int
