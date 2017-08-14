@@ -2,6 +2,7 @@ package vmgen
 
 import (
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -58,7 +59,8 @@ type instruction struct {
 
 func (vm *VM) getNextInstruction(offset int, bytecode []byte) instruction {
 	size := vm.AssignedParameters["Instruction Size"]
-	return vm.Instructions[string(bytecode[offset:offset+int(size)])]
+	intSize := new(big.Int).SetBytes(size).Int64() // TODO: test
+	return vm.Instructions[string(bytecode[offset:int64(offset)+intSize])]
 }
 
 const prototype = "vmgen.efp"
@@ -98,23 +100,28 @@ func CreateVM(path string, parameters map[string]int,
 
 		i.description = e.FirstField("description").Value()
 
-		// try to get fuel as an integer
-		fuel, err := strconv.ParseInt(e.FirstField("fuel").Value(), 10, 64)
-
-		// if not, it's a fuel function
-		if err != nil {
-			i.fuel = int(fuel)
+		if f, ok := fuels[i.mnemonic]; ok {
+			i.fuelFunction = f
 		} else {
-			i.fuelFunction = fuels[e.FirstField("fuel").Value()]
+			if e.FirstField("fuel") == nil {
+				i.fuel = 0
+			} else {
+				fuel, err := strconv.ParseInt(e.FirstField("fuel").Value(), 10, 64)
+				if err != nil {
+
+				} else {
+					i.fuel = int(fuel)
+				}
+			}
+
 		}
 
-		i.execute = executes[i.Mnemonic]
+		i.execute = executes[i.mnemonic]
 
 		vm.Instructions[string(i.opcode)] = i
 	}
 
 	vm.stats = new(stats)
-
 	vm.Stack = new(Stack)
 	return &vm, nil
 }

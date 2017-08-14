@@ -14,5 +14,5 @@ func TestDisasm(t *testing.T) {
 			return fmt.Sprintf("| PUSH | %d | %x |", size, bytecode[offset+1:offset+1+size]), size + 1
 		},
 	})
-	vm.DisasmString("01")
+	vm.DisasmString("010101")
 }
