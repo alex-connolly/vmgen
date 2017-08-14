@@ -6,7 +6,7 @@ import (
 )
 
 // DisasmFunction ...
-type DisasmFunction func(int, []byte) (string, int)
+type DisasmFunction func(*VM, int, []byte) ([]string, int)
 
 // DisasmBytes ...
 func (vm *VM) DisasmBytes(bytecode []byte) {
@@ -21,13 +21,13 @@ func (vm *VM) DisasmBytes(bytecode []byte) {
 		count += len(v)
 	}
 	for i := count; i < len(bytecode); i++ {
-		str, offset := vm.getNextInstruction(i, bytecode).disasmFunction(i, bytecode)
+		str, offset := vm.getNextInstruction(i, bytecode).disasmFunction(vm, i, bytecode)
 		i += offset
 		log.Println(str)
 	}
 }
 
-func defaultDisasm(offset int, bytecode []byte) ([]string, int) {
+func defaultDisasm(vm *VM, offset int, bytecode []byte) ([]string, int) {
 	// default is just to return the instruction mnemonic
 	return nil, 0
 }

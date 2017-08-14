@@ -113,7 +113,6 @@ func CreateVM(path string, parameters map[string]int,
 					i.fuel = int(fuel)
 				}
 			}
-
 		}
 
 		i.execute = executes[i.mnemonic]
