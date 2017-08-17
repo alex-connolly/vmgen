@@ -22,12 +22,10 @@ func TestPop(t *testing.T) {
 	goutil.Assert(t, vm.Stack.Size() == 0, "wrong starting length")
 	vm.Stack.Push(data)
 	goutil.Assert(t, vm.Stack.Size() == 1, "wrong length after push")
-	bytes := vm.Stack.Pop(1)
+	bytes := vm.Stack.Pop()
 	goutil.Assert(t, vm.Stack.Size() == 0, "wrong length")
-	goutil.Assert(t, len(bytes) == 1,
-		fmt.Sprintf("wrong popped value %d, expected %d", len(data), 1))
-	goutil.Assert(t, len(data) == len(bytes[0]),
-		fmt.Sprintf("wrong popped value %d, expected %d", len(data), len(bytes[0])))
+	goutil.Assert(t, len(bytes) == len(data),
+		fmt.Sprintf("wrong popped value %d, expected %d", len(bytes), len(data)))
 
 }
 
@@ -41,7 +39,7 @@ func TestValidate(t *testing.T) {
 	goutil.Assert(t, vm.Stack.validate(0), "wrong validate 0")
 	goutil.Assert(t, vm.Stack.validate(1), "wrong validate 1")
 	goutil.Assert(t, !vm.Stack.validate(2), "wrong validate 2")
-	vm.Stack.Pop(1)
+	vm.Stack.Pop()
 	goutil.Assert(t, vm.Stack.validate(0), "wrong validate 0")
 	goutil.Assert(t, !vm.Stack.validate(1), "wrong validate 1")
 }

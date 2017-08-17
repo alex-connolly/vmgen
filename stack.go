@@ -20,14 +20,11 @@ func (s *Stack) Push(data []byte) {
 	s.data = append(s.data, data)
 }
 
-// Pop returns and removes the first items from the stack
-func (s *Stack) Pop(size int) [][]byte {
-	if s.validate(size) {
-		values := s.data[len(s.data)-size:]
-		s.data = s.data[:len(s.data)-size]
-		return values
-	}
-	return nil
+// Pop returns and removes the top byte array from the stack
+func (s *Stack) Pop() []byte {
+	values := s.data[len(s.data)-1]
+	s.data = s.data[:len(s.data)-1]
+	return values
 }
 
 func (s *Stack) validate(size int) bool {
