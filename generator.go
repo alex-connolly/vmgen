@@ -4,11 +4,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
-	"path/filepath"
 	"reflect"
-	"strconv"
-
-	"github.com/end-r/efp"
 )
 
 // VM ...
@@ -24,8 +20,11 @@ type VM struct {
 	stats              *stats
 	Stack              *Stack
 	Memory             []interface{}
-	Environment        *Environment
+	Environment        Environment
 	Contract           *Contract
+	Bytecode           []byte
+	NumOpcodes         int
+	opcodes            map[string]string
 }
 
 // Address ...
@@ -64,66 +63,6 @@ func (vm *VM) getNextInstruction(offset int, bytecode []byte) instruction {
 }
 
 const prototype = "vmgen.efp"
-
-// CreateVM creates a new FireVM instance
-func CreateVM(path string, parameters map[string]int,
-	executes map[string]ExecuteFunction, fuels map[string]FuelFunction,
-	disasms map[string]DisasmFunction) (*VM, []string) {
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	exPath := filepath.Dir(ex)
-	p, errs := efp.PrototypeFile(exPath + "/" + prototype)
-	if errs != nil {
-		fmt.Printf("Invalid Prototype File\n")
-		fmt.Println(errs)
-		return nil, errs
-	}
-	e, errs := p.ValidateFile(path)
-	if errs != nil {
-		fmt.Printf("Invalid VM File %s\n", path)
-		return nil, errs
-	}
-
-	var vm VM
-	// no need to check for nil: would have errored
-	vm.Author = e.FirstField("author").Value()
-	vm.Name = e.FirstField("name").Value()
-
-	vm.Instructions = make(map[string]instruction)
-	for _, e := range e.Elements("instruction") {
-		var i instruction
-
-		i.mnemonic = e.Parameter(0).Value()
-		i.opcode = []byte(e.Parameter(1).Value())
-
-		i.description = e.FirstField("description").Value()
-
-		if f, ok := fuels[i.mnemonic]; ok {
-			i.fuelFunction = f
-		} else {
-			if e.FirstField("fuel") == nil {
-				i.fuel = 0
-			} else {
-				fuel, err := strconv.ParseInt(e.FirstField("fuel").Value(), 10, 64)
-				if err != nil {
-
-				} else {
-					i.fuel = int(fuel)
-				}
-			}
-		}
-
-		i.execute = executes[i.mnemonic]
-
-		vm.Instructions[string(i.opcode)] = i
-	}
-
-	vm.stats = new(stats)
-	vm.Stack = new(Stack)
-	return &vm, nil
-}
 
 func (vm *VM) createParameters(params []string) []reflect.Value {
 	var vals []reflect.Value

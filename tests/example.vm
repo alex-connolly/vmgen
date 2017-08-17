@@ -1,17 +1,17 @@
 name = "Example"
 author = "[7][7][7]"
-receiver = "VM"
 
-instruction("ADD"){
+instruction("ADD", "01"){
     description = "Finds the sum of two numbers."
-    pop = 2
-    push = 1
     fuel = 100
 }
 
-instruction("PUSH"){
-    hex = 0
+instruction("PUSH", "02"){
     description = "Pushes a number onto the stack."
-    push = 1
+    fuel = 30
+}
+
+instruction("TEST", "03"){
+    description = "Test instruction."
     fuel = 30
 }

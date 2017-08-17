@@ -1,6 +1,6 @@
 # VMGen
 
-An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines, initially developed for use with [FireVM](https://www.github.com/end-r/firevm). 
+An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines, initially developed for use with [FireVM](https://www.github.com/end-r/firevm).
 
 ## Example
 
@@ -12,18 +12,14 @@ name = "Example"
 author = "[7][7][7]"
 receiver = "VM"
 
-instruction("ADD"){
+instruction("ADD", "01"){
     description = "Finds the sum of two numbers."
-    pop = 2
-    push = 1
     fuel = 100
 }
 
-instruction("PUSH"){
+instruction("PUSH", "01"){
     hex = 0
     description = "Pushes a number onto the stack."
-    push = 1
-    fuel = 30
 }
 ```
 

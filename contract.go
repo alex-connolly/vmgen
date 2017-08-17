@@ -19,7 +19,7 @@ type Contract struct {
 	Input    []byte
 	Offset   int
 
-	Gas   uint64
+	Fuel  uint64
 	value *big.Int
 
 	Args []byte
@@ -29,5 +29,6 @@ type Contract struct {
 
 // Next @size bytes
 func (c *Contract) Next(size int) []byte {
-	return nil
+	c.Offset += size
+	return c.Code[c.Offset-size : c.Offset]
 }

@@ -2,7 +2,7 @@ name : string
 author : string
 
 alias IDOrInt = identifier|int
-alias hex = "0x[0-9][A-F]+"
+alias hex = "[0-9][A-F]+"
 
 <1:instruction>(string, hex){
     description : string
