@@ -21,6 +21,7 @@ type VM struct {
 	Stack              *Stack
 	Memory             []interface{}
 	Environment        Environment
+	State              State
 	Contract           *Contract
 	Bytecode           []byte
 	NumOpcodes         int
