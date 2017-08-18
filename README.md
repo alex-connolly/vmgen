@@ -66,15 +66,15 @@ func main(){
 }
 
 func Add(vm *vmgen.VM){
-    a := vm.Stack.Pop()
-    b := vm.Stack.Pop()
+    a := new(big.Int).SetBytes(vm.Stack.Pop())
+    b := new(big.Int).SetBytes(vm.Stack.Pop())
     c := new(big.Int).Add(a, b)
-    vm.Stack.Push(c)
+    vm.Stack.Push(c.Bytes())
 }
 
 func Push(vm *vmgen.VM){
-    size := vm.Contract.Next(1)
-    value := vm.Contract.Next(size)
+    size := vm.Input.Next(1)
+    value := vm.Input.Next(size)
     vm.Stack.Push(value)
 }
 ```
@@ -108,7 +108,7 @@ fuels = map[string]vmgen.FuelFunction{
     "HI": getFuel,
 }
 
-getFuel(vm *vmgen.VM) int{
+getFuel(vm *vmgen.VM) int {
 
 }
 ```

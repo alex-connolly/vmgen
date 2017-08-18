@@ -50,10 +50,12 @@ func (b *Byterable) HasNext() bool {
 	return b.Offset < len(b.Data)
 }
 
+// Size of the byte array
 func (b *Byterable) Size() int {
 	return len(b.Data)
 }
 
+// Append bytes to data
 func (b *Byterable) Append(bytes ...byte) {
 	if b.Data == nil {
 		b.Data = make([]byte, 0)

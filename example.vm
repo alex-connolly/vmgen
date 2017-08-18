@@ -8,7 +8,7 @@ instruction("ADD", "01"){
 
 instruction("PUSH", "02"){
     description = "Pushes a number onto the stack."
-    fuel = 30
+    fuel = 10
 }
 
 instruction("TEST", "03"){

@@ -4,8 +4,15 @@ author : string
 alias IDOrInt = identifier|int
 alias hex = "[0-9][A-F]+"
 
-<1:instruction>(string, hex){
+alias instructionsAllowed = instruction(string, hex){
     description : string
     validate : int
     fuel : int
+}
+
+instructionsAllowed
+
+category(string){
+    description : string
+    instructionsAllowed
 }

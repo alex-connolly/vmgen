@@ -16,3 +16,14 @@ func FromHexBytes(bytes []byte) []byte {
 func FromHexString(str string) []byte {
 	return FromHexBytes([]byte(str))
 }
+
+// StringFromHexBytes ...
+func StringFromHexBytes(bytes []byte) string {
+	bytes = FromHexBytes(bytes)
+	return string(bytes)
+}
+
+// StringFromHexString ...
+func StringFromHexString(str string) string {
+	return StringFromHexBytes([]byte(str))
+}

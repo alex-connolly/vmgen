@@ -1,26 +1,12 @@
 package vmgen
 
 import (
-	"os"
+	"log"
 )
 
 // ExecuteFile parses opcodes from a file
 func (vm *VM) ExecuteFile(path string) []string {
-	f, err := os.Open(path)
-	if err != nil {
-		return []string{err.Error()}
-	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return []string{err.Error()}
-	}
-	bytes := make([]byte, fi.Size())
-	_, err = f.Read(bytes)
-	if err != nil {
-		return []string{err.Error()}
-	}
-	return vm.ExecuteBytes(bytes)
+	return vm.ExecuteBytes(GetFileBytes(path))
 }
 
 // ExecuteString parses opcodes from a string
@@ -30,9 +16,12 @@ func (vm *VM) ExecuteString(data string) []string {
 
 // ExecuteBytes parses opcodes from a byte array
 func (vm *VM) ExecuteBytes(bytes []byte) []string {
+	log.Printf("bytes length: %d", len(bytes))
 	vm.Input = new(BasicInput)
 	vm.Input.Code().Append(bytes...)
+	log.Println("xx")
 	vm.assignParameters()
+	log.Println("yy")
 	for vm.Input.Code().HasNext() {
 		vm.executeInstruction(vm.nextInstruction())
 	}
@@ -40,32 +29,22 @@ func (vm *VM) ExecuteBytes(bytes []byte) []string {
 }
 
 func (vm *VM) executeInstruction(i *instruction) {
-	i.execute(vm)
+	log.Println("a")
+	if i.hasExecuteFunction {
+		i.execute(vm)
+	}
 	vm.stats.operations++
-	if i.fuelFunction != nil {
+	log.Println("b")
+	if i.hasFuelFunction {
 		vm.stats.fuelConsumption += i.fuel
 	} else {
-		//vm.stats.fuelConsumption += i.fuelFunction(vm)
+		vm.stats.fuelConsumption += i.fuelFunction(vm)
 	}
 }
 
 // ExecuteHexFile parses hex opcodes from a file
 func (vm *VM) ExecuteHexFile(path string) []string {
-	f, err := os.Open(path)
-	if err != nil {
-		return []string{err.Error()}
-	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return []string{err.Error()}
-	}
-	bytes := make([]byte, fi.Size())
-	_, err = f.Read(bytes)
-	if err != nil {
-		return []string{err.Error()}
-	}
-	return vm.ExecuteHexBytes(bytes)
+	return vm.ExecuteHexBytes(GetFileBytes(path))
 }
 
 // ExecuteHexString ...
@@ -75,5 +54,8 @@ func (vm *VM) ExecuteHexString(hex string) []string {
 
 // ExecuteHexBytes parses opcodes from a byte array
 func (vm *VM) ExecuteHexBytes(bytes []byte) []string {
+	if len(bytes)%2 != 0 {
+		return []string{"Invalid Hex Input"}
+	}
 	return vm.ExecuteBytes(FromHexBytes(bytes))
 }

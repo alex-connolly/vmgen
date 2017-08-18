@@ -6,7 +6,7 @@ import (
 	"github.com/end-r/goutil"
 )
 
-func TestExecuteFile(t *testing.T) {
+func TestExecuteHexFile(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size": 1,
@@ -15,6 +15,17 @@ func TestExecuteFile(t *testing.T) {
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
 	vm.ExecuteHexFile("example.bytes")
+}
+
+func TestExecuteFile(t *testing.T) {
+	vm, errs := CreateVM("example.vm",
+		map[string]int{
+			"size": 1,
+		},
+		executes, nil, nil)
+	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
+	goutil.Assert(t, errs == nil, "errs should be nil")
+	vm.ExecuteFile("example_binary.bytes")
 }
 
 func TestExecuteHexSingleParameter(t *testing.T) {

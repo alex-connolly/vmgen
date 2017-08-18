@@ -49,57 +49,55 @@ func CreateVM(path string, parameters map[string]int,
 	vm.AssignedParameters = make(map[string][]byte)
 	vm.stats = new(stats)
 
+	vm.executes = executes
+	vm.fuels = fuels
+	vm.disasms = disasms
+
 	vm.Instructions = make(map[string]*instruction)
 	vm.mnemonics = make(map[string]string)
 	for _, e := range e.Elements("instruction") {
-		var i instruction
-		i.mnemonic = e.Parameter(0).Value()
-
-		s := e.Parameter(1).Value()
-
-		opcode := FromHexString(s)
-
-		if len(opcode) == 1 {
-			i.opcode = string(opcode[:])
-		} else {
-			log.Println(opcode)
-			i.opcode = strconv.Itoa(int(opcode[0]))
+		errs := vm.AddInstruction(vm.Instructions, e)
+		if errs != nil {
+			return nil, errs
 		}
-
-		fmt.Printf("opcode: %s\n", i.opcode)
-
-		i.description = e.FirstField("description").Value()
-
-		if f, ok := fuels[i.mnemonic]; ok {
-			i.fuelFunction = f
-		} else {
-			if e.FirstField("fuel") == nil {
-				i.fuel = 0
-			} else {
-				fuel, err := strconv.ParseInt(e.FirstField("fuel").Value(), 10, 64)
-				if err != nil {
-					return nil, []string{err.Error()}
-				} else {
-					i.fuel = int(fuel)
-				}
-			}
-		}
-
-		if disasms != nil {
-			if d, ok := disasms[i.mnemonic]; ok {
-				i.disasmFunction = d
-			} else {
-				i.disasmFunction = defaultDisasm
-			}
-		}
-
-		i.execute = executes[i.mnemonic]
-
-		vm.Instructions[string(i.opcode)] = &i
-		vm.mnemonics[i.mnemonic] = string(i.opcode)
 	}
 
+	for _, cat := range e.Elements("category") {
+		var c category
+		c.name = cat.Parameter(0).Value()
+		c.description = cat.FirstField("description").Value()
+		for _, e := range cat.Elements("instruction") {
+			errs := vm.AddInstruction(c.instructions, e)
+			if errs != nil {
+				return nil, errs
+			}
+		}
+	}
 	vm.stats = new(stats)
 	vm.Stack = new(Stack)
 	return &vm, nil
+}
+
+func (vm *VM) AddInstruction(is map[string]*instruction, e *efp.Element) []string {
+	var i instruction
+	i.mnemonic = e.Parameter(0).Value()
+
+	s := e.Parameter(1).Value()
+
+	opcode := FromHexString(s)
+
+	if len(opcode) == 1 {
+		i.opcode = string(opcode[:])
+	} else {
+		log.Println(opcode)
+		i.opcode = strconv.Itoa(int(opcode[0]))
+	}
+
+	fmt.Printf("opcode: %s\n", i.opcode)
+
+	i.description = e.FirstField("description").Value()
+
+	is[string(i.opcode)] = &i
+	//vm.mnemonics[i.mnemonic] = string(i.opcode)
+	return nil
 }
