@@ -3,7 +3,6 @@ package vmgen
 // Input ...
 type Input interface {
 	Code() *Byterable
-	SetCode(*Byterable)
 	/*Input() *Byterable
 	Address(string) Address
 	Bytes(string) []byte
@@ -18,12 +17,12 @@ type BasicInput struct {
 	code *Byterable
 }
 
+// Code ...
 func (b *BasicInput) Code() *Byterable {
+	if b.code == nil {
+		b.code = new(Byterable)
+	}
 	return b.code
-}
-
-func (b *BasicInput) SetCode(by *Byterable) {
-	b.code = by
 }
 
 // Byterable = Bytes + Iterable
@@ -49,4 +48,15 @@ func (b *Byterable) Next(size int) []byte {
 // HasNext ...
 func (b *Byterable) HasNext() bool {
 	return b.Offset < len(b.Data)
+}
+
+func (b *Byterable) Size() int {
+	return len(b.Data)
+}
+
+func (b *Byterable) Append(bytes ...byte) {
+	if b.Data == nil {
+		b.Data = make([]byte, 0)
+	}
+	b.Data = append(b.Data, bytes...)
 }

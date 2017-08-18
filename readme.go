@@ -7,10 +7,7 @@ import (
 
 // GenerateReadMe generates a read me
 func (vm *VM) GenerateReadMe(name string) {
-	f, err := os.Create(name)
-	if err != nil {
-		return
-	}
+	f, _ := os.Create(name)
 	defer f.Close()
 	f.Write([]byte("| " + "Opcode"))
 	f.Write([]byte("| " + "Description"))

@@ -4,7 +4,6 @@ An [efp-based](https://www.github.com/end-r/efp) generator for virtual machines,
 
 ## Example
 
-
 In ```example.vm```:
 
 ```go
@@ -18,7 +17,6 @@ instruction("ADD", "01"){
 }
 
 instruction("PUSH", "01"){
-    hex = 0
     description = "Pushes a number onto the stack."
 }
 ```
@@ -36,7 +34,7 @@ ADD
 Or a fully compiled version:
 
 ```go
-0x010201010201020102010502
+010201010201020102010502
 ```
 
 Now, our Go program:
@@ -63,7 +61,7 @@ var (
 
 func main(){
     vm := vmgen.CreateVM("example.vm", executes, fuels)
-    vm.ExecuteFile(fuel, "example.fire")
+    vm.ExecuteHexFile(fuel, "example.fire")
     vm.Stats()
 }
 

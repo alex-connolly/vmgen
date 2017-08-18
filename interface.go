@@ -1,7 +1,6 @@
 package vmgen
 
 import (
-	"encoding/hex"
 	"ender/efp"
 	"fmt"
 	"log"
@@ -9,17 +8,22 @@ import (
 )
 
 // AddBytecode ...
-func (vm *VM) AddBytecode(mnemonic string, params ...byte) {
-	if vm.Bytecode == nil {
-		vm.Bytecode = make([]byte, 0)
+func (vm *VM) AddBytecode(mnemonic string, params ...byte) error {
+	if vm.Input == nil {
+		vm.Input = new(BasicInput)
 	}
-	if i, ok := vm.Instructions[vm.opcodes[mnemonic]]; ok {
-		vm.Bytecode = append(vm.Bytecode, i.opcode...)
-		vm.Bytecode = append(vm.Bytecode, params...)
-		vm.NumOpcodes++
-	} else {
-		log.Printf("Invalid Instruction %s\n", mnemonic)
+	opcode, ok := vm.mnemonics[mnemonic]
+	if ok {
+		if i, ok := vm.Instructions[opcode]; ok {
+			if i.opcode != "" {
+				vm.Input.Code().Append([]byte(i.opcode)...)
+				vm.Input.Code().Append(params...)
+				vm.NumOpcodes++
+			}
+			return nil
+		}
 	}
+	return fmt.Errorf("Invalid Instruction %s\n", mnemonic)
 }
 
 // CreateVM creates a new FireVM instance
@@ -28,13 +32,10 @@ func CreateVM(path string, parameters map[string]int,
 	disasms map[string]DisasmFunction) (*VM, []string) {
 	p, errs := efp.PrototypeFile(prototype)
 	if errs != nil {
-		fmt.Printf("Invalid Prototype File\n")
-		fmt.Println(errs)
 		return nil, errs
 	}
 	e, errs := p.ValidateFile(path)
 	if errs != nil {
-		fmt.Printf("Invalid VM File %s\n", path)
 		log.Println(errs)
 		return nil, errs
 	}
@@ -46,21 +47,26 @@ func CreateVM(path string, parameters map[string]int,
 
 	vm.Parameters = parameters
 	vm.AssignedParameters = make(map[string][]byte)
+	vm.stats = new(stats)
 
-	vm.Instructions = make(map[string]instruction)
-	vm.opcodes = make(map[string]string)
+	vm.Instructions = make(map[string]*instruction)
+	vm.mnemonics = make(map[string]string)
 	for _, e := range e.Elements("instruction") {
 		var i instruction
 		i.mnemonic = e.Parameter(0).Value()
 
-		src := []byte(e.Parameter(1).Value())
+		s := e.Parameter(1).Value()
 
-		dst := make([]byte, hex.DecodedLen(len(src)))
-		_, err := hex.Decode(dst, src)
-		if err != nil {
-			log.Fatal(err)
+		opcode := FromHexString(s)
+
+		if len(opcode) == 1 {
+			i.opcode = string(opcode[:])
+		} else {
+			log.Println(opcode)
+			i.opcode = strconv.Itoa(int(opcode[0]))
 		}
-		i.opcode = dst
+
+		fmt.Printf("opcode: %s\n", i.opcode)
 
 		i.description = e.FirstField("description").Value()
 
@@ -72,17 +78,25 @@ func CreateVM(path string, parameters map[string]int,
 			} else {
 				fuel, err := strconv.ParseInt(e.FirstField("fuel").Value(), 10, 64)
 				if err != nil {
-
+					return nil, []string{err.Error()}
 				} else {
 					i.fuel = int(fuel)
 				}
 			}
 		}
-		log.Printf("Mnemonic: %s, Opcode: %s\n", i.mnemonic, string(i.opcode))
+
+		if disasms != nil {
+			if d, ok := disasms[i.mnemonic]; ok {
+				i.disasmFunction = d
+			} else {
+				i.disasmFunction = defaultDisasm
+			}
+		}
+
 		i.execute = executes[i.mnemonic]
 
-		vm.Instructions[string(i.opcode)] = i
-		vm.opcodes[i.mnemonic] = string(i.opcode)
+		vm.Instructions[string(i.opcode)] = &i
+		vm.mnemonics[i.mnemonic] = string(i.opcode)
 	}
 
 	vm.stats = new(stats)

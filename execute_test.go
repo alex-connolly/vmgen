@@ -6,27 +6,29 @@ import (
 	"github.com/end-r/goutil"
 )
 
-func TestEmptyDisasm(t *testing.T) {
-	vm, _ := CreateVM("example.vm", nil, nil, nil, nil)
-	vm.DisasmString("")
+func TestExecuteFile(t *testing.T) {
+	vm, errs := CreateVM("example.vm",
+		map[string]int{
+			"size": 1,
+		},
+		executes, nil, nil)
+	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
+	goutil.Assert(t, errs == nil, "errs should be nil")
+	vm.ExecuteHexFile("example.bytes")
 }
 
-func TestDisasmFile(t *testing.T) {
-	vm, _ := CreateVM("example.vm", nil, nil, nil, nil)
-	vm.DisasmFile("example.bytes")
-}
-
-func TestDisasmHexSingleParameter(t *testing.T) {
+func TestExecuteHexSingleParameter(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size": 1,
 		}, executes, nil, nil)
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
-	vm.DisasmString("01")
+	err := vm.ExecuteHexString("01")
+	goutil.Assert(t, err == nil, "err should be nil")
 }
 
-func TestDisasmHexMultipleParameter(t *testing.T) {
+func TestExecuteHexMultipleParameter(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size":  1,
@@ -34,20 +36,22 @@ func TestDisasmHexMultipleParameter(t *testing.T) {
 		}, executes, nil, nil)
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
-	vm.DisasmString("01AAAA")
+	err := vm.ExecuteHexString("01AAAA")
+	goutil.Assert(t, err == nil, "err should be nil")
 }
 
-func TestDisasmHexSingleParameterSingleInstruction(t *testing.T) {
+func TestExecuteHexSingleParameterSingleInstruction(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size": 1,
 		}, executes, nil, nil)
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
-	vm.DisasmString("0101")
+	err := vm.ExecuteHexString("0101")
+	goutil.Assert(t, err == nil, "err should be nil")
 }
 
-func TestDisasmHexMultipleParameterSingleInstruction(t *testing.T) {
+func TestExecuteHexMultipleParameterSingleInstruction(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size":  1,
@@ -55,20 +59,22 @@ func TestDisasmHexMultipleParameterSingleInstruction(t *testing.T) {
 		}, executes, nil, nil)
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
-	vm.DisasmString("01AAAA01")
+	err := vm.ExecuteHexString("01AAAA01")
+	goutil.Assert(t, err == nil, "err should be nil")
 }
 
-func TestDisasmHexSingleParameterMultipleInstruction(t *testing.T) {
+func TestExecuteHexSingleParameterMultipleInstruction(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size": 1,
 		}, executes, nil, nil)
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
-	vm.DisasmString("010101")
+	err := vm.ExecuteHexString("010101")
+	goutil.Assert(t, err == nil, "err should be nil")
 }
 
-func TestDiasmHexMultipleParameterMultipleInstruction(t *testing.T) {
+func TestExecuteHexMultipleParameterMultipleInstruction(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{
 			"size":  1,
@@ -76,5 +82,6 @@ func TestDiasmHexMultipleParameterMultipleInstruction(t *testing.T) {
 		}, executes, nil, nil)
 	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
 	goutil.Assert(t, errs == nil, "errs should be nil")
-	vm.DisasmString("01AAAA0101")
+	err := vm.ExecuteHexString("01AAAA0101")
+	goutil.Assert(t, err == nil, "err should be nil")
 }

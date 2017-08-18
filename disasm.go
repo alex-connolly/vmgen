@@ -1,35 +1,47 @@
 package vmgen
 
 import (
-	"log"
+	"fmt"
 	"os"
 )
 
 // DisasmFunction ...
-type DisasmFunction func(*VM, int, []byte) ([]string, int)
+type DisasmFunction func(*VM) []string
 
 // DisasmBytes ...
 func (vm *VM) DisasmBytes(bytecode []byte) {
-	log.Printf("%s Disassembler", vm.Name)
+	vm.Input = new(BasicInput)
+	vm.Input.Code().Append(bytecode...)
+	fmt.Printf("\n%s Disassembler\n", vm.Name)
 	for i := 0; i < len(vm.Name)+len(" Disassembler"); i++ {
-		log.Printf("=")
+		fmt.Printf("=")
 	}
-	count := 0
+	fmt.Printf("\n")
 	vm.assignParameters()
 	for k, v := range vm.AssignedParameters {
-		log.Printf("| %s: %x |", k, v)
-		count += len(v)
+		fmt.Printf("| %s | %x |\n", k, v)
 	}
-	for i := count; i < len(bytecode); i++ {
-		str, offset := vm.nextInstruction().disasmFunction(vm, i, bytecode)
-		i += offset
-		log.Println(str)
+	for i := 0; i < len(vm.Name)+len(" Disassembler"); i++ {
+		fmt.Printf("=")
+	}
+	fmt.Printf("\n")
+	for vm.Input.Code().HasNext() {
+		i := vm.nextInstruction()
+		if i != nil {
+			strs := i.disasmFunction(vm)
+			for _, s := range strs {
+				fmt.Printf("| %s", s)
+			}
+			fmt.Printf("|\n")
+		} else {
+			fmt.Printf("i is nil\n")
+		}
 	}
 }
 
-func defaultDisasm(vm *VM, offset int, bytecode []byte) ([]string, int) {
+func defaultDisasm(vm *VM) []string {
 	// default is just to return the instruction mnemonic
-	return nil, 0
+	return []string{vm.Instructions[string(vm.Input.Code().Next(1))].mnemonic}
 }
 
 // DisasmString ...
