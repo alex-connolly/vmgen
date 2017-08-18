@@ -2,9 +2,7 @@ package vmgen
 
 import (
 	"fmt"
-	"math/big"
-	"os"
-	"reflect"
+	"log"
 )
 
 // VM ...
@@ -22,18 +20,10 @@ type VM struct {
 	Memory             []interface{}
 	Environment        Environment
 	State              State
-	Contract           *Contract
+	Input              Input
 	Bytecode           []byte
 	NumOpcodes         int
 	opcodes            map[string]string
-}
-
-// Address ...
-type Address interface {
-}
-
-// Hash ...
-type Hash interface {
 }
 
 // Environment ...
@@ -57,41 +47,11 @@ type instruction struct {
 	count          int
 }
 
-func (vm *VM) getNextInstruction(offset int, bytecode []byte) instruction {
-	size := vm.AssignedParameters["Instruction Size"]
-	intSize := new(big.Int).SetBytes(size).Int64() // TODO: test
-	return vm.Instructions[string(bytecode[offset:int64(offset)+intSize])]
+func (vm *VM) nextInstruction() instruction {
+	return vm.Instructions[string(vm.Input.Code().Next(1))]
 }
 
 const prototype = "vmgen.efp"
-
-func (vm *VM) createParameters(params []string) []reflect.Value {
-	var vals []reflect.Value
-	vals = append(vals, reflect.ValueOf(vm))
-	for _, p := range params {
-		vals = append(vals, reflect.ValueOf(p))
-	}
-	return vals
-}
-
-// ExecuteFile parses opcodes from a file
-func (vm *VM) ExecuteFile(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return err
-	}
-	bytes := make([]byte, fi.Size())
-	_, err = f.Read(bytes)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func (vm *VM) executeInstruction(opcode string) {
 	i := vm.Instructions[opcode]
@@ -106,8 +66,9 @@ func (vm *VM) executeInstruction(opcode string) {
 
 func (vm *VM) assignParameters() {
 	for k, v := range vm.Parameters {
-		vm.AssignedParameters[k] = vm.Contract.Code[vm.Contract.Offset : vm.Contract.Offset+v]
-		vm.Contract.Offset += v
+		log.Println("ASSIGNING")
+		vm.AssignedParameters[k] = vm.Input.Code().Next(v)
+		log.Printf("Assigned %s to byte array of length %d\n", k, len(vm.AssignedParameters[k]))
 	}
 }
 

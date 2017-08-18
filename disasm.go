@@ -21,7 +21,7 @@ func (vm *VM) DisasmBytes(bytecode []byte) {
 		count += len(v)
 	}
 	for i := count; i < len(bytecode); i++ {
-		str, offset := vm.getNextInstruction(i, bytecode).disasmFunction(vm, i, bytecode)
+		str, offset := vm.nextInstruction().disasmFunction(vm, i, bytecode)
 		i += offset
 		log.Println(str)
 	}

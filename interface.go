@@ -44,6 +44,9 @@ func CreateVM(path string, parameters map[string]int,
 	vm.Author = e.FirstField("author").Value()
 	vm.Name = e.FirstField("name").Value()
 
+	vm.Parameters = parameters
+	vm.AssignedParameters = make(map[string][]byte)
+
 	vm.Instructions = make(map[string]instruction)
 	vm.opcodes = make(map[string]string)
 	for _, e := range e.Elements("instruction") {

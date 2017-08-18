@@ -8,7 +8,7 @@ import (
 )
 
 func TestAddBytecode(t *testing.T) {
-	vm, _ := CreateVM("tests/example.vm", nil, nil, nil, nil)
+	vm, _ := CreateVM("example.vm", nil, nil, nil, nil)
 	goutil.AssertNow(t, vm != nil, "vm is nil")
 	vm.AddBytecode("PUSH", byte(1), byte(1))
 	goutil.Assert(t, len(vm.Bytecode) == 3,
