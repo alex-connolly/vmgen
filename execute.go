@@ -1,9 +1,5 @@
 package vmgen
 
-import (
-	"log"
-)
-
 // ExecuteFile parses opcodes from a file
 func (vm *VM) ExecuteFile(path string) []string {
 	return vm.ExecuteBytes(GetFileBytes(path))
@@ -16,12 +12,9 @@ func (vm *VM) ExecuteString(data string) []string {
 
 // ExecuteBytes parses opcodes from a byte array
 func (vm *VM) ExecuteBytes(bytes []byte) []string {
-	log.Printf("bytes length: %d", len(bytes))
 	vm.Input = new(BasicInput)
 	vm.Input.Code().Append(bytes...)
-	log.Println("xx")
 	vm.assignParameters()
-	log.Println("yy")
 	for vm.Input.Code().HasNext() {
 		vm.executeInstruction(vm.nextInstruction())
 	}
@@ -29,16 +22,22 @@ func (vm *VM) ExecuteBytes(bytes []byte) []string {
 }
 
 func (vm *VM) executeInstruction(i *instruction) {
-	log.Println("a")
-	if i.hasExecuteFunction {
-		i.execute(vm)
-	}
-	vm.stats.operations++
-	log.Println("b")
-	if i.hasFuelFunction {
-		vm.stats.fuelConsumption += i.fuel
-	} else {
-		vm.stats.fuelConsumption += i.fuelFunction(vm)
+	if i != nil {
+		if vm.executes != nil {
+			if e, ok := vm.executes[i.mnemonic]; ok {
+				e(vm)
+			}
+		}
+		vm.stats.operations++
+		if vm.fuels != nil {
+			if f, ok := vm.fuels[i.mnemonic]; ok {
+				f(vm)
+			} else {
+				vm.stats.fuelConsumption += i.fuel
+			}
+		} else {
+			vm.stats.fuelConsumption += i.fuel
+		}
 	}
 }
 

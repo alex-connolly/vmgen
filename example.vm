@@ -6,12 +6,18 @@ instruction("ADD", "01"){
     fuel = 100
 }
 
-instruction("PUSH", "02"){
-    description = "Pushes a number onto the stack."
-    fuel = 10
-}
+category("Pushers"){
 
-instruction("TEST", "03"){
-    description = "Test instruction."
-    fuel = 30
+    description = "Things which push"
+
+    instruction("PUSH", "02"){
+        description = "Pushes a number onto the stack."
+        fuel = 10
+    }
+
+    instruction("TEST", "03"){
+        description = "Test instruction."
+        fuel = 30
+    }
+
 }

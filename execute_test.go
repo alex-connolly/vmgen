@@ -28,6 +28,17 @@ func TestExecuteFile(t *testing.T) {
 	vm.ExecuteFile("example_binary.bytes")
 }
 
+func TestExecuteString(t *testing.T) {
+	vm, errs := CreateVM("example.vm",
+		map[string]int{
+			"size": 1,
+		},
+		executes, nil, nil)
+	goutil.Assert(t, vm != nil, "vm shouldn't be nil")
+	goutil.Assert(t, errs == nil, "errs should be nil")
+	vm.ExecuteString("1010")
+}
+
 func TestExecuteHexSingleParameter(t *testing.T) {
 	vm, errs := CreateVM("example.vm",
 		map[string]int{

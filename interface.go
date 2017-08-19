@@ -4,7 +4,6 @@ import (
 	"ender/efp"
 	"fmt"
 	"log"
-	"strconv"
 )
 
 // AddBytecode ...
@@ -12,16 +11,11 @@ func (vm *VM) AddBytecode(mnemonic string, params ...byte) error {
 	if vm.Input == nil {
 		vm.Input = new(BasicInput)
 	}
-	opcode, ok := vm.mnemonics[mnemonic]
-	if ok {
-		if i, ok := vm.Instructions[opcode]; ok {
-			if i.opcode != "" {
-				vm.Input.Code().Append([]byte(i.opcode)...)
-				vm.Input.Code().Append(params...)
-				vm.NumOpcodes++
-			}
-			return nil
-		}
+	if i, ok := vm.mnemonics[mnemonic]; ok {
+		vm.Input.Code().Append(i.opcode)
+		vm.Input.Code().Append(params...)
+		vm.NumOpcodes++
+		return nil
 	}
 	return fmt.Errorf("Invalid Instruction %s\n", mnemonic)
 }
@@ -53,51 +47,62 @@ func CreateVM(path string, parameters map[string]int,
 	vm.fuels = fuels
 	vm.disasms = disasms
 
-	vm.Instructions = make(map[string]*instruction)
-	vm.mnemonics = make(map[string]string)
+	vm.Instructions = make(map[byte]*instruction)
+	vm.mnemonics = make(map[string]*instruction)
+
 	for _, e := range e.Elements("instruction") {
-		errs := vm.AddInstruction(vm.Instructions, e)
+		errs := vm.AddInstruction(nil, e)
 		if errs != nil {
 			return nil, errs
 		}
 	}
 
 	for _, cat := range e.Elements("category") {
-		var c category
+		c := new(category)
 		c.name = cat.Parameter(0).Value()
-		c.description = cat.FirstField("description").Value()
+		if cat.Fields("description") != nil {
+			c.description = cat.FirstField("description").Value()
+		}
 		for _, e := range cat.Elements("instruction") {
-			errs := vm.AddInstruction(c.instructions, e)
+			errs := vm.AddInstruction(c, e)
 			if errs != nil {
 				return nil, errs
 			}
 		}
+		if vm.categories == nil {
+			vm.categories = make(map[string]*category)
+		}
+		vm.categories[c.name] = c
 	}
+
 	vm.stats = new(stats)
 	vm.Stack = new(Stack)
 	return &vm, nil
 }
 
-func (vm *VM) AddInstruction(is map[string]*instruction, e *efp.Element) []string {
-	var i instruction
+func stringToOpcode(str string) byte {
+	return FromHexString(str)[0]
+}
+
+// AddInstruction ...
+func (vm *VM) AddInstruction(c *category, e *efp.Element) []string {
+
+	i := new(instruction)
 	i.mnemonic = e.Parameter(0).Value()
 
-	s := e.Parameter(1).Value()
-
-	opcode := FromHexString(s)
-
-	if len(opcode) == 1 {
-		i.opcode = string(opcode[:])
-	} else {
-		log.Println(opcode)
-		i.opcode = strconv.Itoa(int(opcode[0]))
-	}
-
-	fmt.Printf("opcode: %s\n", i.opcode)
+	i.opcode = stringToOpcode(e.Parameter(1).Value())
 
 	i.description = e.FirstField("description").Value()
 
-	is[string(i.opcode)] = &i
-	//vm.mnemonics[i.mnemonic] = string(i.opcode)
+	vm.Instructions[i.opcode] = i
+
+	vm.mnemonics[i.mnemonic] = i
+
+	if c != nil {
+		if c.instructions == nil {
+			c.instructions = make(map[string]*instruction)
+		}
+		c.instructions[i.mnemonic] = i
+	}
 	return nil
 }

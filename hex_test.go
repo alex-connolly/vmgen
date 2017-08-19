@@ -1,7 +1,6 @@
 package vmgen
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/end-r/goutil"
@@ -33,14 +32,4 @@ func TestFromHexBytes(t *testing.T) {
 	goutil.Assert(t, len(bytes) == 4, "wrong byte length")
 	bytes = FromHexBytes(bytes)
 	goutil.Assert(t, len(bytes) == 2, "wrong byte length")
-}
-
-func TestStringFromHexString(t *testing.T) {
-	hex := "0101"
-	// 0101 --> 5
-	str := StringFromHexString(hex)
-	goutil.Assert(t, len(str) == 1,
-		fmt.Sprintf("wrong string length: %d", len(str)))
-	goutil.Assert(t, str == "5", fmt.Sprintf("wrong string value: %s", str))
-
 }

@@ -2,14 +2,15 @@ package vmgen
 
 import (
 	"fmt"
-	"log"
 )
 
 // VM ...
 type VM struct {
 	Name               string
 	Author             string
-	Instructions       map[string]*instruction
+	categories         map[string]*category
+	Instructions       map[byte]*instruction
+	mnemonics          map[string]*instruction
 	Parameters         map[string]int
 	AssignedParameters map[string][]byte
 	PC                 int
@@ -21,10 +22,10 @@ type VM struct {
 	State              State
 	Input              Input
 	NumOpcodes         int
-	mnemonics          map[string]string
-	executes           map[string]ExecuteFunction
-	fuels              map[string]FuelFunction
-	disasms            map[string]DisasmFunction
+
+	executes map[string]ExecuteFunction
+	fuels    map[string]FuelFunction
+	disasms  map[string]DisasmFunction
 }
 
 // Environment ...
@@ -38,17 +39,11 @@ type ExecuteFunction func(*VM)
 
 // Instruction for the current FireVM instance
 type instruction struct {
-	mnemonic           string
-	opcode             string
-	description        string
-	execute            ExecuteFunction
-	fuel               int
-	fuelFunction       FuelFunction
-	disasmFunction     DisasmFunction
-	count              int
-	hasFuelFunction    bool
-	hasExecuteFunction bool
-	hasDisasmFunction  bool
+	mnemonic    string
+	opcode      byte
+	description string
+	fuel        int
+	count       int
 }
 
 type category struct {
@@ -58,20 +53,19 @@ type category struct {
 }
 
 func (vm *VM) nextInstruction() *instruction {
-	idx := string(vm.Input.Code().Next(1))
-	return vm.Instructions[idx]
+	return vm.Instructions[vm.nextOpcode()]
+}
+
+func (vm *VM) nextOpcode() byte {
+	return vm.Input.Code().Next(1)[0]
 }
 
 const prototype = "vmgen.efp"
 
 func (vm *VM) assignParameters() {
-	log.Println("a")
-	log.Printf("input size: %d", vm.Input.Code().Size())
 	for k, v := range vm.Parameters {
-		log.Println("b")
 		vm.AssignedParameters[k] = vm.Input.Code().Next(v)
 	}
-	log.Println("c")
 }
 
 func version() string {

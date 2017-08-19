@@ -7,6 +7,11 @@ import (
 	"github.com/end-r/goutil"
 )
 
+func TestStringToOpcode(t *testing.T) {
+	str := "01"
+	goutil.Assert(t, stringToOpcode(str) == 1, fmt.Sprintf("wrong opcode: %b", stringToOpcode(str)))
+}
+
 func TestAddBytecode(t *testing.T) {
 	vm, _ := CreateVM("example.vm", nil, nil, nil, nil)
 	goutil.AssertNow(t, vm != nil, "vm is nil")

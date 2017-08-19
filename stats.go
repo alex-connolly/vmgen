@@ -43,9 +43,9 @@ func (vm *VM) DetailedStats() {
 	si := vm.sortByFuelConsumption()
 	for i, op := range si {
 		fmt.Printf("| %d ", i+1)
-		fmt.Printf("| %s ", op.opcode)
+		fmt.Printf("| %b ", op.opcode)
 		fmt.Printf("| %d", op.count)
 		fmt.Printf("| %d", op.fuel*op.count)
-		fmt.Printf("|")
+		fmt.Printf("|\n")
 	}
 }

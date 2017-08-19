@@ -2,6 +2,7 @@ package vmgen
 
 import "os"
 
+// GetFileBytes ...
 func GetFileBytes(path string) []byte {
 	f, err := os.Open(path)
 	if err != nil {
