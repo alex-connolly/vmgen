@@ -2,5 +2,7 @@ package vmgen
 
 // Memory ...
 type Memory interface {
-	Display()
+	DisplayContents()
+	Size() int
+	Usage() int
 }
