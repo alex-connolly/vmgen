@@ -17,7 +17,7 @@ type VM struct {
 	Current            *instruction
 	stats              *stats
 	Stack              *Stack
-	Memory             []interface{}
+	Memory             map[string]Memory
 	Environment        Environment
 	State              State
 	Input              Input
