@@ -7,6 +7,9 @@ type Memory interface {
 
 // AddMemory ...
 func (vm *VM) AddMemory(key string, m Memory) {
+	if vm.Memory == nil {
+		vm.Memory = make(map[string]Memory)
+	}
 	vm.Memory[key] = m
 }
 

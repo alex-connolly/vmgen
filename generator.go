@@ -8,6 +8,7 @@ import (
 type VM struct {
 	Name               string
 	Author             string
+	Description        string
 	categories         map[string]*category
 	Instructions       map[byte]*instruction
 	mnemonics          map[string]*instruction

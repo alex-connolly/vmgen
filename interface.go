@@ -38,6 +38,7 @@ func CreateVM(path string, parameters map[string]int,
 	// no need to check for nil: would have errored
 	vm.Author = e.FirstField("author").Value()
 	vm.Name = e.FirstField("name").Value()
+	vm.Description = e.FirstField("description").Value()
 
 	vm.Parameters = parameters
 	vm.AssignedParameters = make(map[string][]byte)

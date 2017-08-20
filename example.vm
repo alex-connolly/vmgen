@@ -1,5 +1,6 @@
 name = "Example"
-author = "[7][7][7]"
+author = "Alex"
+description = "A toy VM."
 
 instruction("ADD", "01"){
     description = "Finds the sum of two numbers."

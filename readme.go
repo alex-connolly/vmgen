@@ -9,18 +9,21 @@ import (
 func (vm *VM) GenerateReadMe(name string) {
 	f, _ := os.Create(name)
 	defer f.Close()
+	f.WriteString("# " + vm.Name + "(" + vm.Author + ")\n")
+	f.WriteString(vm.Description + "\n")
+
 	for _, c := range vm.categories {
-		f.Write([]byte("## " + c.name + "\n"))
-		f.Write([]byte("### " + c.description + "\n"))
-		f.Write([]byte("| " + "Opcode"))
-		f.Write([]byte("| " + "Description"))
-		f.Write([]byte("| " + "Fuel"))
-		f.Write([]byte("|\n"))
+		f.WriteString("## " + c.name + "\n")
+		f.WriteString("### " + c.description + "\n")
+		f.WriteString("| " + "Opcode")
+		f.WriteString("| " + "Description")
+		f.WriteString("| " + "Fuel")
+		f.WriteString("|\n")
 		for _, v := range c.instructions {
-			f.Write([]byte("| " + string(v.opcode)))
-			f.Write([]byte("| " + v.description))
-			f.Write([]byte("| " + strconv.Itoa(v.fuel)))
-			f.Write([]byte("|\n"))
+			f.WriteString("| " + string(v.opcode))
+			f.WriteString("| " + v.description)
+			f.WriteString("| " + strconv.Itoa(v.fuel))
+			f.WriteString("|\n")
 		}
 	}
 

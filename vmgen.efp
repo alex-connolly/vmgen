@@ -1,5 +1,6 @@
 name : string
 author : string
+description : string
 
 alias IDOrInt = identifier|int
 alias hex = "[0-9][A-F]+"
