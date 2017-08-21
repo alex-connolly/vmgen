@@ -21,7 +21,7 @@ func (vm *VM) ExecuteBytes(bytes []byte) []string {
 	return nil
 }
 
-func (vm *VM) executeInstruction(i *instruction) {
+func (vm *VM) executeInstruction(i *Instruction) {
 	if i != nil {
 		if vm.executes != nil {
 			if e, ok := vm.executes[i.mnemonic]; ok {

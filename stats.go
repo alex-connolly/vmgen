@@ -19,7 +19,7 @@ func (vm *VM) Stats() {
 	fmt.Printf("Fuel/operation: %f\n", float64(vm.stats.operations)/float64(vm.stats.fuelConsumption))
 }
 
-func (vm *VM) sortByFuelConsumption() []*instruction {
+func (vm *VM) sortByFuelConsumption() []*Instruction {
 	il := make(instructionList, len(vm.Instructions))
 	i := 0
 	for _, v := range vm.Instructions {
@@ -30,7 +30,7 @@ func (vm *VM) sortByFuelConsumption() []*instruction {
 	return il
 }
 
-type instructionList []*instruction
+type instructionList []*Instruction
 
 func (l instructionList) Len() int { return len(l) }
 func (l instructionList) Less(i, j int) bool {

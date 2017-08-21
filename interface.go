@@ -1,9 +1,10 @@
 package vmgen
 
 import (
-	"ender/efp"
 	"fmt"
 	"log"
+
+	"github.com/end-r/efp"
 )
 
 // AddBytecode ...
@@ -48,8 +49,8 @@ func CreateVM(path string, parameters map[string]int,
 	vm.fuels = fuels
 	vm.disasms = disasms
 
-	vm.Instructions = make(map[byte]*instruction)
-	vm.mnemonics = make(map[string]*instruction)
+	vm.Instructions = make(map[byte]*Instruction)
+	vm.mnemonics = make(map[string]*Instruction)
 
 	for _, e := range e.Elements("instruction") {
 		errs := vm.AddInstruction(nil, e)
@@ -88,7 +89,7 @@ func stringToOpcode(str string) byte {
 // AddInstruction ...
 func (vm *VM) AddInstruction(c *category, e *efp.Element) []string {
 
-	i := new(instruction)
+	i := new(Instruction)
 	i.mnemonic = e.Parameter(0).Value()
 
 	i.opcode = stringToOpcode(e.Parameter(1).Value())
@@ -101,7 +102,7 @@ func (vm *VM) AddInstruction(c *category, e *efp.Element) []string {
 
 	if c != nil {
 		if c.instructions == nil {
-			c.instructions = make(map[string]*instruction)
+			c.instructions = make(map[string]*Instruction)
 		}
 		c.instructions[i.mnemonic] = i
 	}

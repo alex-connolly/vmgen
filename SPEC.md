@@ -1,4 +1,4 @@
-# Example(Alex)
+# Example (Alex)
 A toy VM.
 ## Pushers
 ### Things which push

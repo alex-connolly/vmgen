@@ -10,12 +10,12 @@ type VM struct {
 	Author             string
 	Description        string
 	categories         map[string]*category
-	Instructions       map[byte]*instruction
-	mnemonics          map[string]*instruction
+	Instructions       map[byte]*Instruction
+	mnemonics          map[string]*Instruction
 	Parameters         map[string]int
 	AssignedParameters map[string][]byte
 	PC                 int
-	Current            *instruction
+	Current            *Instruction
 	stats              *stats
 	Stack              *Stack
 	Memory             map[string]Memory
@@ -39,7 +39,7 @@ type FuelFunction func(*VM) int
 type ExecuteFunction func(*VM)
 
 // Instruction for the current FireVM instance
-type instruction struct {
+type Instruction struct {
 	mnemonic    string
 	opcode      byte
 	description string
@@ -50,10 +50,10 @@ type instruction struct {
 type category struct {
 	name         string
 	description  string
-	instructions map[string]*instruction
+	instructions map[string]*Instruction
 }
 
-func (vm *VM) nextInstruction() *instruction {
+func (vm *VM) nextInstruction() *Instruction {
 	return vm.Instructions[vm.nextOpcode()]
 }
 

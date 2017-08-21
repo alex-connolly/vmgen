@@ -9,7 +9,7 @@ import (
 func (vm *VM) GenerateReadMe(name string) {
 	f, _ := os.Create(name)
 	defer f.Close()
-	f.WriteString("# " + vm.Name + "(" + vm.Author + ")\n")
+	f.WriteString("# " + vm.Name + " (" + vm.Author + ")\n")
 	f.WriteString(vm.Description + "\n")
 
 	for _, c := range vm.categories {
