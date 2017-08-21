@@ -13,7 +13,7 @@ func (vm *VM) AddBytecode(mnemonic string, params ...byte) error {
 		vm.Input = new(BasicInput)
 	}
 	if i, ok := vm.mnemonics[mnemonic]; ok {
-		vm.Input.Code().Append(i.opcode)
+		vm.Input.Code().Append(i.Opcode)
 		vm.Input.Code().Append(params...)
 		vm.NumOpcodes++
 		return nil
@@ -90,21 +90,21 @@ func stringToOpcode(str string) byte {
 func (vm *VM) AddInstruction(c *category, e *efp.Element) []string {
 
 	i := new(Instruction)
-	i.mnemonic = e.Parameter(0).Value()
+	i.Mnemonic = e.Parameter(0).Value()
 
-	i.opcode = stringToOpcode(e.Parameter(1).Value())
+	i.Opcode = stringToOpcode(e.Parameter(1).Value())
 
 	i.description = e.FirstField("description").Value()
 
-	vm.Instructions[i.opcode] = i
+	vm.Instructions[i.Opcode] = i
 
-	vm.mnemonics[i.mnemonic] = i
+	vm.mnemonics[i.Mnemonic] = i
 
 	if c != nil {
 		if c.instructions == nil {
 			c.instructions = make(map[string]*Instruction)
 		}
-		c.instructions[i.mnemonic] = i
+		c.instructions[i.Mnemonic] = i
 	}
 	return nil
 }

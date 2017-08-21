@@ -24,13 +24,13 @@ func (vm *VM) ExecuteBytes(bytes []byte) []string {
 func (vm *VM) executeInstruction(i *Instruction) {
 	if i != nil {
 		if vm.executes != nil {
-			if e, ok := vm.executes[i.mnemonic]; ok {
+			if e, ok := vm.executes[i.Mnemonic]; ok {
 				e(vm)
 			}
 		}
 		vm.stats.operations++
 		if vm.fuels != nil {
-			if f, ok := vm.fuels[i.mnemonic]; ok {
+			if f, ok := vm.fuels[i.Mnemonic]; ok {
 				f(vm)
 			} else {
 				vm.stats.fuelConsumption += i.fuel

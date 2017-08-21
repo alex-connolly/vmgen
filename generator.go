@@ -40,8 +40,8 @@ type ExecuteFunction func(*VM)
 
 // Instruction for the current FireVM instance
 type Instruction struct {
-	mnemonic    string
-	opcode      byte
+	Mnemonic    string
+	Opcode      byte
 	description string
 	fuel        int
 	count       int

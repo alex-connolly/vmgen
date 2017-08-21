@@ -20,7 +20,7 @@ func (vm *VM) GenerateReadMe(name string) {
 		f.WriteString("| " + "Fuel")
 		f.WriteString("|\n")
 		for _, v := range c.instructions {
-			f.WriteString("| " + string(v.opcode))
+			f.WriteString("| " + string(v.Opcode))
 			f.WriteString("| " + v.description)
 			f.WriteString("| " + strconv.Itoa(v.fuel))
 			f.WriteString("|\n")

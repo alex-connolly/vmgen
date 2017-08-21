@@ -29,7 +29,7 @@ func (vm *VM) DisasmBytes(bytecode []byte) {
 		i := vm.nextInstruction()
 		if i != nil {
 			var strs []string
-			if d, ok := vm.disasms[i.mnemonic]; ok {
+			if d, ok := vm.disasms[i.Mnemonic]; ok {
 				strs = d(vm)
 			} else {
 				strs = defaultDisasm(vm)
@@ -46,7 +46,7 @@ func (vm *VM) DisasmBytes(bytecode []byte) {
 
 func defaultDisasm(vm *VM) []string {
 	// default is just to return the instruction mnemonic
-	return []string{vm.Instructions[vm.nextOpcode()].mnemonic}
+	return []string{vm.Instructions[vm.nextOpcode()].Mnemonic}
 }
 
 // DisasmString ...
