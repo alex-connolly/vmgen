@@ -26,6 +26,5 @@ func (vm *VM) GenerateReadMe(name string) {
 			f.WriteString("|\n")
 		}
 	}
-
 	f.Sync()
 }

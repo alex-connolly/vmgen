@@ -21,11 +21,33 @@ func (vm *VM) AddBytecode(mnemonic string, params ...byte) error {
 	return fmt.Errorf("Invalid Instruction %s\n", mnemonic)
 }
 
+const prototype = `
+name : string
+author : string
+description : string
+
+alias IDOrInt = identifier|int
+alias hex = "[0-9][A-F]+"
+
+alias instructionsAllowed = instruction(string, hex){
+    description : string
+    validate : int
+    fuel : int
+}
+
+instructionsAllowed
+
+category(string){
+    description : string
+    instructionsAllowed
+}
+`
+
 // CreateVM creates a new FireVM instance
 func CreateVM(path string, parameters map[string]int,
 	executes map[string]ExecuteFunction, fuels map[string]FuelFunction,
 	disasms map[string]DisasmFunction) (*VM, []string) {
-	p, errs := efp.PrototypeFile(prototype)
+	p, errs := efp.PrototypeString(prototype)
 	if errs != nil {
 		return nil, errs
 	}

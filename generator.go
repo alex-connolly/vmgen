@@ -61,8 +61,6 @@ func (vm *VM) nextOpcode() byte {
 	return vm.Input.Code().Next(1)[0]
 }
 
-const prototype = "vmgen.efp"
-
 func (vm *VM) assignParameters() {
 	for k, v := range vm.Parameters {
 		vm.AssignedParameters[k] = vm.Input.Code().Next(v)
