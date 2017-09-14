@@ -44,14 +44,14 @@ category(string){
 `
 
 // CreateVM creates a new FireVM instance
-func CreateVM(path string, parameters map[string]int,
+func CreateVM(data string, parameters map[string]int,
 	executes map[string]ExecuteFunction, fuels map[string]FuelFunction,
 	disasms map[string]DisasmFunction) (*VM, []string) {
 	p, errs := efp.PrototypeString(prototype)
 	if errs != nil {
 		return nil, errs
 	}
-	e, errs := p.ValidateFile(path)
+	e, errs := p.ValidateString(data)
 	if errs != nil {
 		log.Println(errs)
 		return nil, errs
