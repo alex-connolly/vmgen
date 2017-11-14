@@ -44,14 +44,11 @@ category(string){
 `
 
 // CreateVM creates a new FireVM instance
-func CreateVM(data string, parameters map[string]int,
+func CreateVM(path string, parameters map[string]int,
 	executes map[string]ExecuteFunction, fuels map[string]FuelFunction,
 	disasms map[string]DisasmFunction) (*VM, []string) {
-	p, errs := efp.PrototypeString(prototype)
-	if errs != nil {
-		return nil, errs
-	}
-	e, errs := p.ValidateString(data)
+	p, _ := efp.PrototypeString(prototype)
+	e, errs := p.ValidateFile(path)
 	if errs != nil {
 		log.Println(errs)
 		return nil, errs
@@ -116,7 +113,9 @@ func (vm *VM) AddInstruction(c *category, e *efp.Element) []string {
 
 	i.Opcode = stringToOpcode(e.Parameter(1).Value())
 
-	i.description = e.FirstField("description").Value()
+	if e.Fields("description") != nil && len(e.Fields("description")) > 0 {
+		i.description = e.FirstField("description").Value()
+	}
 
 	vm.Instructions[i.Opcode] = i
 
