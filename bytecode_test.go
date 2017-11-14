@@ -26,7 +26,7 @@ func TestBytecodeConcat(t *testing.T) {
 	b.Add("ADD")
 	goutil.Assert(t, b.Length() == 1, "wrong b length")
 
-	o := new(Bytecode)
+	o := Bytecode{}
 	o.Add("ADD")
 	goutil.Assert(t, o.Length() == 1, "wrong o length")
 
