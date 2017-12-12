@@ -6,13 +6,15 @@ import (
 
 // Bytecode is composed of commands
 type Bytecode struct {
-	commands []Command
+	commands []*Command
 }
 
 // Command ...
 type Command struct {
 	mnemonic   string
 	parameters []byte
+	isMarker   bool
+	offset     int
 }
 
 // Length ...
@@ -21,9 +23,9 @@ func (b *Bytecode) Length() int {
 }
 
 // AddCommand to the current bytecode
-func (b *Bytecode) AddCommand(c Command) {
+func (b *Bytecode) AddCommand(c *Command) {
 	if b.commands == nil {
-		b.commands = make([]Command, 0)
+		b.commands = make([]*Command, 0)
 	}
 	b.commands = append(b.commands, c)
 }
@@ -33,8 +35,19 @@ func (b *Bytecode) Add(mnemonic string, parameters ...byte) {
 	c := Command{
 		mnemonic:   mnemonic,
 		parameters: parameters,
+		isMarker:   false,
 	}
-	b.AddCommand(c)
+	b.AddCommand(&c)
+}
+
+// AddMarker ...
+func (b *Bytecode) AddMarker(mnemonic string, offset int) {
+	c := Command{
+		mnemonic: mnemonic,
+		offset:   offset,
+		isMarker: true,
+	}
+	b.AddCommand(&c)
 }
 
 // Concat another bytecode struct onto ours
@@ -81,4 +94,16 @@ func (b *Bytecode) Format() string {
 		s += fmt.Sprintf("%d | %s %v\n", i+1, c.mnemonic, c.parameters)
 	}
 	return s
+}
+
+// Finalise ...
+func (b *Bytecode) Finalise() {
+	// TODO: what if the index is larger than 256
+	for i, c := range b.commands {
+		if c.isMarker {
+			c.parameters = []byte{
+				byte(c.offset + i),
+			}
+		}
+	}
 }

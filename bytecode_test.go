@@ -1,6 +1,7 @@
 package vmgen
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/end-r/goutil"
@@ -11,7 +12,7 @@ func TestBytecodeAddCommand(t *testing.T) {
 	c := Command{
 		mnemonic: "ADD",
 	}
-	b.AddCommand(c)
+	b.AddCommand(&c)
 	goutil.Assert(t, b.Length() == 1, "wrong length")
 }
 
@@ -32,4 +33,14 @@ func TestBytecodeConcat(t *testing.T) {
 
 	b.Concat(o)
 	goutil.Assert(t, b.Length() == 2, "wrong total length")
+}
+
+func TestBytecodeFinalise(t *testing.T) {
+	b := new(Bytecode)
+	b.Add("ADD")
+	b.AddMarker("PUSH", 10)
+	b.Finalise()
+	goutil.Assert(t, b.Length() == 2, "wrong total length")
+	goutil.Assert(t, b.commands[1].offset == 10, fmt.Sprintf("wrong offset: %d", b.commands[1].offset))
+	goutil.Assert(t, len(b.commands[1].parameters) == 1, fmt.Sprintf("wrong offset: %d", len(b.commands[1].parameters)))
 }
