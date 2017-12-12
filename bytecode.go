@@ -1,6 +1,7 @@
 package vmgen
 
 import (
+	"encoding/binary"
 	"fmt"
 )
 
@@ -98,12 +99,10 @@ func (b *Bytecode) Format() string {
 
 // Finalise ...
 func (b *Bytecode) Finalise() {
-	// TODO: what if the index is larger than 256
 	for i, c := range b.commands {
 		if c.isMarker {
-			c.parameters = []byte{
-				byte(c.offset + i),
-			}
+			c.parameters = make([]byte, 8)
+			binary.LittleEndian.PutUint64(c.parameters, uint64(c.offset+i))
 		}
 	}
 }

@@ -42,5 +42,4 @@ func TestBytecodeFinalise(t *testing.T) {
 	b.Finalise()
 	goutil.Assert(t, b.Length() == 2, "wrong total length")
 	goutil.Assert(t, b.commands[1].offset == 10, fmt.Sprintf("wrong offset: %d", b.commands[1].offset))
-	goutil.Assert(t, len(b.commands[1].parameters) == 1, fmt.Sprintf("wrong offset: %d", len(b.commands[1].parameters)))
 }
