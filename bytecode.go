@@ -106,3 +106,16 @@ func (b *Bytecode) Finalise() {
 		}
 	}
 }
+
+// CompareMnemonics ...
+func (b *Bytecode) CompareMnemonics(test []string) bool {
+	if len(test) != len(b.commands) {
+		return false
+	}
+	for i, t := range test {
+		if t != b.commands[i].mnemonic {
+			return false
+		}
+	}
+	return true
+}
