@@ -18,6 +18,13 @@ type Command struct {
 	offset     int
 }
 
+type Instruction struct {
+	opcode uint
+	cost   func(interface{}) int
+}
+
+type InstructionMap map[string]Instruction
+
 // Length ...
 func (b *Bytecode) Length() int {
 	return len(b.commands)
@@ -121,14 +128,16 @@ func (b *Bytecode) CompareMnemonics(test []string) bool {
 }
 
 type Generator interface {
-	Opcodes() map[string][]byte
+	Instructions() InstructionMap
 }
 
 func (b *Bytecode) Generate(g Generator) []byte {
 	bytes := make([]byte, 0)
-	opcodes := g.Opcodes()
+	is := g.Instructions()
 	for _, c := range b.commands {
-		bytes = append(bytes, opcodes[c.mnemonic]...)
+		bs := make([]byte, 4)
+		binary.LittleEndian.PutUint32(bs, uint32(is[c.mnemonic].opcode))
+		bytes = append(bytes, bs...)
 		bytes = append(bytes, c.parameters...)
 	}
 	return bytes

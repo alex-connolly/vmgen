@@ -1,11 +1,6 @@
 package vmgen
 
-import (
-	"testing"
-
-	"github.com/end-r/goutil"
-)
-
+/*
 func TestEmptyDisasm(t *testing.T) {
 	vm, _ := CreateVM("example.vm", nil, nil, nil, nil)
 	vm.DisasmString("")
@@ -78,3 +73,5 @@ func TestDiasmHexMultipleParameterMultipleInstruction(t *testing.T) {
 	goutil.Assert(t, errs == nil, "errs should be nil")
 	vm.DisasmString("01AAAA0101")
 }
+
+*/

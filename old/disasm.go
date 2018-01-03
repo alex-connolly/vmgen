@@ -1,15 +1,11 @@
 package vmgen
 
-import (
-	"fmt"
-	"os"
-)
-
+/*
 // DisasmFunction ...
-type DisasmFunction func(*VM) []string
+type DisasmFunction func() []string
 
 // DisasmBytes ...
-func (vm *VM) DisasmBytes(bytecode []byte) {
+func DisasmBytes(bytecode []byte) {
 	vm.Input = new(BasicInput)
 	vm.Input.Code().Append(bytecode...)
 	fmt.Printf("\n%s Disassembler\n", vm.Name)
@@ -44,18 +40,18 @@ func (vm *VM) DisasmBytes(bytecode []byte) {
 	}
 }
 
-func defaultDisasm(vm *VM) []string {
+func defaultDisasm() []string {
 	// default is just to return the instruction mnemonic
 	return []string{vm.Instructions[vm.nextOpcode()].Mnemonic}
 }
 
 // DisasmString ...
-func (vm *VM) DisasmString(data string) {
+func DisasmString(data string) {
 	vm.DisasmBytes([]byte(data))
 }
 
 // DisasmFile ...
-func (vm *VM) DisasmFile(path string) {
+func DisasmFile(path string) {
 	f, err := os.Open(path)
 	if err != nil {
 		return
@@ -72,3 +68,4 @@ func (vm *VM) DisasmFile(path string) {
 	}
 	vm.DisasmBytes(bytes)
 }
+*/
