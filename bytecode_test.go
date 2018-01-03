@@ -43,3 +43,23 @@ func TestBytecodeFinalise(t *testing.T) {
 	goutil.Assert(t, b.Length() == 2, "wrong total length")
 	goutil.Assert(t, b.commands[1].offset == 10, fmt.Sprintf("wrong offset: %d", b.commands[1].offset))
 }
+
+type TestGen struct {
+}
+
+func (tg TestGen) Opcodes() map[string][]byte {
+	return map[string][]byte{
+		"ADD": []byte{byte(0x01)},
+		"SUB": []byte{byte(0x02)},
+	}
+}
+
+func TestBytecodeGenerateMnemonics(t *testing.T) {
+	b := new(Bytecode)
+	b.Add("ADD")
+	b.Add("SUB")
+	b.Add("ADD")
+	bytes := b.Generate(TestGen{})
+	goutil.AssertLength(t, len(bytes), 3)
+	fmt.Println(bytes)
+}

@@ -119,3 +119,17 @@ func (b *Bytecode) CompareMnemonics(test []string) bool {
 	}
 	return true
 }
+
+type Generator interface {
+	Opcodes() map[string][]byte
+}
+
+func (b *Bytecode) Generate(g Generator) []byte {
+	bytes := make([]byte, 0)
+	opcodes := g.Opcodes()
+	for _, c := range b.commands {
+		bytes = append(bytes, opcodes[c.mnemonic]...)
+		bytes = append(bytes, c.parameters...)
+	}
+	return bytes
+}
