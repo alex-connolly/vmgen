@@ -19,8 +19,8 @@ type Command struct {
 }
 
 type Instruction struct {
-	opcode uint
-	cost   func(interface{}) int
+	Opcode uint
+	Cost   func(interface{}) int
 }
 
 type InstructionMap map[string]Instruction
@@ -136,7 +136,7 @@ func (b *Bytecode) Generate(g Generator) []byte {
 	is := g.Instructions()
 	for _, c := range b.commands {
 		bs := make([]byte, 4)
-		binary.LittleEndian.PutUint32(bs, uint32(is[c.mnemonic].opcode))
+		binary.LittleEndian.PutUint32(bs, uint32(is[c.mnemonic].Opcode))
 		bytes = append(bytes, bs...)
 		bytes = append(bytes, c.parameters...)
 	}
