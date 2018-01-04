@@ -18,12 +18,23 @@ type Command struct {
 	offset     int
 }
 
+type CostFunc func(interface{}) int
+
 type Instruction struct {
 	Opcode uint
-	Cost   func(interface{}) int
+	Cost   CostFunc
 }
 
 type InstructionMap map[string]Instruction
+
+func (im InstructionMap) AddAll(m InstructionMap) {
+	if im == nil {
+		im = make(InstructionMap)
+	}
+	for k, v := range m {
+		im[k] = v
+	}
+}
 
 // Length ...
 func (b *Bytecode) Length() int {
